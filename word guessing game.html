@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Word Guessing Game</title>
+  <style>
+    body {
+      text-align: center;
+      background: #f2f2f2;
+      font-family: Arial;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #wordDisplay span {
+      font-size: 32px;
+      margin: 5px;
+      border-bottom: 2px solid black;
+      padding: 4px 10px;
+      display: inline-block;
+    }
+    input {
+      margin-top: 15px;
+      padding: 8px;
+      font-size: 18px;
+      width: 180px;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      margin-left: 5px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    #message {
+      font-size: 20px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Word Guessing Game</h1>
+  <p id="hint"></p>
+  <div id="wordDisplay"></div>
+
+  <input type="text" maxlength="1" id="guessInput" placeholder="Enter a letter">
+  <button onclick="guessLetter()">Guess</button>
+
+  <p>Wrong Attempts: <span id="wrongCount">0</span> / 6</p>
+  <p id="message"></p>
+
+  <script>
+    const words = [
+      { word: "javascript", hint: "Programming language for web" },
+      { word: "elephant", hint: "Largest land animal" },
+      { word: "pyramid", hint: "Egypt is famous for this" },
+      { word: "oxygen", hint: "Gas essential for breathing" }
+    ];
+
+    let selected = words[Math.floor(Math.random() * words.length)];
+    let hidden = Array(selected.word.length).fill("_");
+    let wrong = 0;
+    let guessedLetters = [];
+
+    document.getElementById("hint").innerHTML = "Hint: " + selected.hint;
+    updateDisplay();
+
+    function updateDisplay() {
+      document.getElementById("wordDisplay").innerHTML = hidden.map(letter => `<span>${letter}</span>`).join("");
+    }
+
+    function guessLetter() {
+      let input = document.getElementById("guessInput").value.toLowerCase();
+      document.getElementById("guessInput").value = "";
+
+      if (!input.match(/[a-z]/) || input.length !== 1) {
+        alert("Enter a valid letter!");
+        return;
+      }
+
+      if (guessedLetters.includes(input)) {
+        document.getElementById("message").innerHTML = "⚠️ Already tried this letter!";
+        return;
+      }
+
+      guessedLetters.push(input);
+
+      if (selected.word.includes(input)) {
+        [...selected.word].forEach((ch, i) => {
+          if (ch === input) hidden[i] = input;
+        });
+      } else {
+        wrong++;
+        document.getElementById("wrongCount").innerText = wrong;
+      }
+
+      updateDisplay();
+      checkGameStatus();
+    }
+
+    function checkGameStatus() {
+      if (!hidden.includes("_")) {
+        document.getElementById("message").innerHTML = "🎉 You guessed the word! Game restarting...";
+        setTimeout(() => location.reload(), 2000);
+      }
+
+      if (wrong >= 6) {
+        document.getElementById("message").innerHTML = "❌ Game Over! The word was: " + selected.word;
+        setTimeout(() => location.reload(), 3000);
+      }
+    }
+  </script>
+
+</body>
+</html>
